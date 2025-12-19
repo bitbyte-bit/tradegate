@@ -1,0 +1,433 @@
+// Trade Gate - App logic (client-side only, localStorage persistence)
+
+const state = {
+  user: null,
+  products: [],
+  saved: [],
+  deferredPrompt: null
+};
+
+const els = {
+  year: document.getElementById('year'),
+  // nav
+  navBrowse: document.getElementById('navBrowse'),
+  navPost: document.getElementById('navPost'),
+  navAccount: document.getElementById('navAccount'),
+  browseView: document.getElementById('browseView'),
+  postView: document.getElementById('postView'),
+  accountView: document.getElementById('accountView'),
+  // browse
+  searchInput: document.getElementById('searchInput'),
+  categoryFilter: document.getElementById('categoryFilter'),
+  refreshBtn: document.getElementById('refreshBtn'),
+  productGrid: document.getElementById('productGrid'),
+  browseEmpty: document.getElementById('browseEmpty'),
+  // post
+  postForm: document.getElementById('postForm'),
+  prodName: document.getElementById('prodName'),
+  prodPrice: document.getElementById('prodPrice'),
+  prodCategory: document.getElementById('prodCategory'),
+  prodDesc: document.getElementById('prodDesc'),
+  prodImage: document.getElementById('prodImage'),
+  postNote: document.getElementById('postNote'),
+  myProductList: document.getElementById('myProductList'),
+  myEmpty: document.getElementById('myEmpty'),
+  // account
+  authForm: document.getElementById('authForm'),
+  authName: document.getElementById('authName'),
+  authEmail: document.getElementById('authEmail'),
+  authPass: document.getElementById('authPass'),
+  authNote: document.getElementById('authNote'),
+  authSignedOut: document.getElementById('authSignedOut'),
+  authSignedIn: document.getElementById('authSignedIn'),
+  accountName: document.getElementById('accountName'),
+  accountEmail: document.getElementById('accountEmail'),
+  signOutBtn: document.getElementById('signOutBtn'),
+  statPosted: document.getElementById('statPosted'),
+  statSaved: document.getElementById('statSaved'),
+  savedList: document.getElementById('savedList'),
+  savedEmpty: document.getElementById('savedEmpty'),
+  // install
+  installBtn: document.getElementById('installBtn'),
+  installNote: document.getElementById('installNote'),
+  // template
+  productCardTpl: document.getElementById('productCardTpl')
+};
+
+// Initialization
+els.year.textContent = new Date().getFullYear();
+loadFromStorage();
+renderAll();
+wireEvents();
+seedDemoProducts();
+
+// -------- Storage --------
+function loadFromStorage() {
+  try {
+    state.user = JSON.parse(localStorage.getItem('tg_user')) || null;
+    state.products = JSON.parse(localStorage.getItem('tg_products')) || [];
+    state.saved = JSON.parse(localStorage.getItem('tg_saved')) || [];
+  } catch (e) {
+    console.warn('Storage parse failed', e);
+    state.user = null;
+    state.products = [];
+    state.saved = [];
+  }
+}
+
+function saveToStorage() {
+  localStorage.setItem('tg_user', JSON.stringify(state.user));
+  localStorage.setItem('tg_products', JSON.stringify(state.products));
+  localStorage.setItem('tg_saved', JSON.stringify(state.saved));
+}
+
+// -------- Events --------
+function wireEvents() {
+  // Navigation
+  els.navBrowse.addEventListener('click', () => showView('browse'));
+  els.navPost.addEventListener('click', () => showView('post'));
+  els.navAccount.addEventListener('click', () => showView('account'));
+
+  // Filters
+  els.searchInput.addEventListener('input', renderBrowse);
+  els.categoryFilter.addEventListener('change', renderBrowse);
+  els.refreshBtn.addEventListener('click', () => {
+    // Placeholder for future server sync
+    toast('Refreshed product list.');
+    renderBrowse();
+  });
+
+  // Post product
+  els.postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!state.user) {
+      els.postNote.textContent = 'Sign in to post products.';
+      return;
+    }
+    const name = els.prodName.value.trim();
+    const price = Number(els.prodPrice.value);
+    const category = els.prodCategory.value;
+    const desc = els.prodDesc.value.trim();
+
+    if (!name || !price || !category || !desc) {
+      els.postNote.textContent = 'Fill all required fields.';
+      return;
+    }
+
+    const id = cryptoRandomId();
+    const seller = state.user.name;
+    let imageUrl = await fileToDataUrl(els.prodImage.files?.[0]).catch(() => null);
+    if (!imageUrl) imageUrl = placeholderImage(category);
+
+    const product = { id, name, price, category, desc, imageUrl, seller, createdAt: Date.now(), ownerEmail: state.user.email };
+    state.products.unshift(product);
+    saveToStorage();
+    els.postForm.reset();
+    els.postNote.textContent = 'Product posted.';
+    renderMyProducts();
+    renderBrowse();
+    updateStats();
+  });
+
+  // Auth
+  els.authForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = els.authName.value.trim();
+    const email = els.authEmail.value.trim().toLowerCase();
+    const pass = els.authPass.value;
+    if (!name || !email || pass.length < 6) {
+      els.authNote.textContent = 'Check your details (password needs 6+ characters).';
+      return;
+    }
+    state.user = { name, email };
+    saveToStorage();
+    els.authForm.reset();
+    els.authNote.textContent = '';
+    renderAuth();
+    updateStats();
+    toast(`Welcome, ${name}.`);
+  });
+
+  els.signOutBtn.addEventListener('click', () => {
+    state.user = null;
+    saveToStorage();
+    renderAuth();
+    updateStats();
+    toast('Signed out.');
+  });
+
+  // Install
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    state.deferredPrompt = e;
+    els.installNote.textContent = 'Available to install.';
+    els.installBtn.disabled = false;
+  });
+  els.installBtn.addEventListener('click', async () => {
+    if (!state.deferredPrompt) return;
+    state.deferredPrompt.prompt();
+    const choice = await state.deferredPrompt.userChoice;
+    els.installNote.textContent = choice.outcome === 'accepted' ? 'Installed.' : 'Install dismissed.';
+    state.deferredPrompt = null;
+  });
+}
+
+// -------- Rendering --------
+function showView(name) {
+  const views = { browse: els.browseView, post: els.postView, account: els.accountView };
+  for (const v of Object.values(views)) v.classList.remove('active');
+  for (const b of [els.navBrowse, els.navPost, els.navAccount]) b.classList.remove('active');
+
+  views[name].classList.add('active');
+  ({ browse: els.navBrowse, post: els.navPost, account: els.navAccount }[name]).classList.add('active');
+
+  if (name === 'browse') renderBrowse();
+  if (name === 'post') renderMyProducts();
+  if (name === 'account') renderAccountView();
+}
+
+function renderAll() {
+  renderAuth();
+  renderBrowse();
+  renderMyProducts();
+  renderAccountView();
+  updateStats();
+}
+
+function renderAuth() {
+  const signedIn = !!state.user;
+  els.authSignedOut.classList.toggle('hidden', signedIn);
+  els.authSignedIn.classList.toggle('hidden', !signedIn);
+  if (signedIn) {
+    els.accountName.textContent = state.user.name;
+    els.accountEmail.textContent = state.user.email;
+  }
+}
+
+function renderBrowse() {
+  const term = els.searchInput.value.trim().toLowerCase();
+  const cat = els.categoryFilter.value;
+
+  const filtered = state.products.filter(p => {
+    const matchesTerm = !term || [p.name, p.desc, p.seller, p.category].some(v => String(v).toLowerCase().includes(term));
+    const matchesCat = !cat || p.category === cat;
+    return matchesTerm && matchesCat;
+  });
+
+  els.productGrid.innerHTML = '';
+  els.browseEmpty.style.display = filtered.length ? 'none' : 'block';
+
+  for (const product of filtered) {
+    const card = document.importNode(els.productCardTpl.content, true);
+    const img = card.querySelector('.product-img');
+    const name = card.querySelector('.product-name');
+    const price = card.querySelector('.product-price');
+    const desc = card.querySelector('.product-desc');
+    const category = card.querySelector('.product-category');
+    const seller = card.querySelector('.product-seller');
+    const saveBtn = card.querySelector('.saveBtn');
+    const shareBtn = card.querySelector('.shareBtn');
+
+    img.src = product.imageUrl;
+    img.alt = product.name;
+    name.textContent = product.name;
+    price.textContent = formatUGX(product.price);
+    desc.textContent = product.desc;
+    category.textContent = product.category;
+    seller.textContent = `Seller: ${product.seller}`;
+
+    saveBtn.addEventListener('click', () => {
+      if (!state.saved.find(s => s.id === product.id)) {
+        state.saved.unshift(product);
+        saveToStorage();
+        updateStats();
+        renderSaved();
+        toast('Saved item.');
+      }
+    });
+
+    shareBtn.addEventListener('click', async () => {
+      const text = `${product.name} — ${formatUGX(product.price)}\n${product.desc}`;
+      const url = location.href;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Trade Gate', text, url }); } catch {}
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        toast('Copied details to clipboard.');
+      }
+    });
+
+    els.productGrid.appendChild(card);
+  }
+}
+
+function renderMyProducts() {
+  const mine = state.user ? state.products.filter(p => p.ownerEmail === state.user.email) : [];
+  els.myProductList.innerHTML = '';
+  els.myEmpty.style.display = mine.length ? 'none' : 'block';
+
+  for (const p of mine) {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <img class="thumb" src="${p.imageUrl}" alt="${p.name}" />
+      <div>
+        <strong>${p.name}</strong><br/>
+        <span class="muted">${formatUGX(p.price)} · ${p.category}</span>
+      </div>
+      <div>
+        <button class="secondary" data-action="edit">Edit</button>
+        <button class="secondary danger" data-action="delete">Delete</button>
+      </div>
+    `;
+    item.querySelector('[data-action="delete"]').addEventListener('click', () => {
+      state.products = state.products.filter(x => x.id !== p.id);
+      saveToStorage();
+      renderMyProducts();
+      renderBrowse();
+      updateStats();
+      toast('Deleted.');
+    });
+    item.querySelector('[data-action="edit"]').addEventListener('click', () => {
+      els.prodName.value = p.name;
+      els.prodPrice.value = p.price;
+      els.prodCategory.value = p.category;
+      els.prodDesc.value = p.desc;
+      toast('Loaded into form. Update and repost to overwrite.');
+      // Simple overwrite behavior:
+      state.products = state.products.filter(x => x.id !== p.id);
+      saveToStorage();
+      renderMyProducts();
+      renderBrowse();
+      updateStats();
+    });
+    els.myProductList.appendChild(item);
+  }
+}
+
+function renderAccountView() {
+  renderSaved();
+}
+
+function renderSaved() {
+  els.savedList.innerHTML = '';
+  els.savedEmpty.style.display = state.saved.length ? 'none' : 'block';
+
+  for (const p of state.saved) {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <img class="thumb" src="${p.imageUrl}" alt="${p.name}" />
+      <div>
+        <strong>${p.name}</strong><br/>
+        <span class="muted">${formatUGX(p.price)} · ${p.category}</span>
+      </div>
+      <div>
+        <button class="secondary danger" data-action="unsave">Unsave</button>
+      </div>
+    `;
+    item.querySelector('[data-action="unsave"]').addEventListener('click', () => {
+      state.saved = state.saved.filter(s => s.id !== p.id);
+      saveToStorage();
+      updateStats();
+      renderSaved();
+      toast('Removed from saved.');
+    });
+    els.savedList.appendChild(item);
+  }
+}
+
+function updateStats() {
+  els.statPosted.textContent = state.user
+    ? state.products.filter(p => p.ownerEmail === state.user.email).length
+    : 0;
+  els.statSaved.textContent = state.saved.length;
+}
+
+// -------- Utilities --------
+function formatUGX(amount) {
+  try {
+    return new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', maximumFractionDigits: 0 }).format(amount);
+  } catch {
+    return `UGX ${amount}`;
+  }
+}
+
+function cryptoRandomId() {
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function placeholderImage(category = 'General') {
+  const colors = {
+    Fashion: '3b82f6', Food: '22c55e', Electronics: 'f59e0b', Beauty: 'ec4899', Home: '8b5cf6', General: '64748b'
+  };
+  const c = colors[category] || colors.General;
+  const text = encodeURIComponent(`${category}`);
+  return `https://via.placeholder.com/600/${c}/0b1220?text=${text}`;
+}
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.position = 'fixed';
+  el.style.bottom = '16px';
+  el.style.left = '50%';
+  el.style.transform = 'translateX(-50%)';
+  el.style.background = '#111827';
+  el.style.color = '#e5e7eb';
+  el.style.border = '1px solid #374151';
+  el.style.padding = '10px 14px';
+  el.style.borderRadius = '12px';
+  el.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)';
+  el.style.zIndex = '1000';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+}
+
+// -------- Demo seed --------
+function seedDemoProducts() {
+  if (state.products.length) return;
+  const demo = [
+    {
+      name: 'Organic Matooke Bundle',
+      price: 25000,
+      category: 'Food',
+      desc: 'Fresh from Nakawa market — delivery available.',
+      seller: 'Nakawa Foods',
+      ownerEmail: 'demo@tradegate.local',
+      imageUrl: placeholderImage('Food')
+    },
+    {
+      name: 'Handmade Kitenge Dress',
+      price: 120000,
+      category: 'Fashion',
+      desc: 'Tailored fit with vibrant patterns.',
+      seller: 'KLA Fashion House',
+      ownerEmail: 'demo@tradegate.local',
+      imageUrl: placeholderImage('Fashion')
+    },
+    {
+      name: 'Power Bank 20,000mAh',
+      price: 85000,
+      category: 'Electronics',
+      desc: 'Fast charging, compact design.',
+      seller: 'TechNakawa',
+      ownerEmail: 'demo@tradegate.local',
+      imageUrl: placeholderImage('Electronics')
+    }
+  ].map(p => ({ ...p, id: cryptoRandomId(), createdAt: Date.now() }));
+  state.products = demo;
+  saveToStorage();
+  renderBrowse();
+}

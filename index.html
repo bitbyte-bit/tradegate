@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
+  />
+  <title>Trade Gate</title>
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Social tags -->
+  <meta name="description" content="Trade Gate — a trading platform for businesses and clients." />
+  <meta property="og:title" content="Trade Gate" />
+  <meta property="og:description" content="Create accounts, post products, and trade with signed-up clients." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icons/icon-512.png" />
+
+  <!-- PWA iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">🛒</span>
+      <h1>Trade Gate</h1>
+    </div>
+    <nav class="nav">
+      <button id="navBrowse" class="nav-btn active">Browse</button>
+      <button id="navPost" class="nav-btn">Post</button>
+      <button id="navAccount" class="nav-btn">Account</button>
+    </nav>
+  </header>
+
+  <main id="viewContainer">
+    <!-- Browse View -->
+    <section id="browseView" class="view active" aria-labelledby="browseHeading">
+      <h2 id="browseHeading" class="sr-only">Browse products</h2>
+
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="Search products..." autocomplete="off" />
+        <select id="categoryFilter">
+          <option value="">All categories</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Food">Food</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Home">Home</option>
+        </select>
+        <button id="refreshBtn" class="secondary">Refresh</button>
+      </div>
+
+      <div id="productGrid" class="grid"></div>
+
+      <div class="empty-state" id="browseEmpty">
+        <p>No products yet. Be the first to post!</p>
+      </div>
+    </section>
+
+    <!-- Post View -->
+    <section id="postView" class="view" aria-labelledby="postHeading">
+      <h2 id="postHeading" class="sr-only">Post a product</h2>
+
+      <form id="postForm" class="card" novalidate>
+        <div class="form-row">
+          <label for="prodName">Product name</label>
+          <input id="prodName" type="text" placeholder="e.g., Leather Wallet" required />
+        </div>
+
+        <div class="form-row">
+          <label for="prodPrice">Price (UGX)</label>
+          <input id="prodPrice" type="number" min="0" step="1" placeholder="e.g., 45000" required />
+        </div>
+
+        <div class="form-row">
+          <label for="prodCategory">Category</label>
+          <select id="prodCategory" required>
+            <option value="">Select category</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Food">Food</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Beauty">Beauty</option>
+            <option value="Home">Home</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="prodDesc">Description</label>
+          <textarea id="prodDesc" rows="3" placeholder="Short description..." required></textarea>
+        </div>
+
+        <div class="form-row">
+          <label for="prodImage">Image</label>
+          <input id="prodImage" type="file" accept="image/*" />
+          <small class="hint">Optional. If omitted, a placeholder image is used.</small>
+        </div>
+
+        <button class="primary" type="submit">Post product</button>
+        <p class="form-note" id="postNote"></p>
+      </form>
+
+      <div class="card">
+        <h3>Your posted products</h3>
+        <div id="myProductList" class="list"></div>
+        <div class="empty-state" id="myEmpty">
+          <p>You haven't posted any products yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Account View -->
+    <section id="accountView" class="view" aria-labelledby="accountHeading">
+      <h2 id="accountHeading" class="sr-only">Account</h2>
+
+      <div id="authCard" class="card">
+        <div id="authSignedOut">
+          <h3>Create account / Sign in</h3>
+          <form id="authForm" novalidate>
+            <div class="form-row">
+              <label for="authName">Business name</label>
+              <input id="authName" type="text" placeholder="e.g., Nakawa Foods Ltd" required />
+            </div>
+            <div class="form-row">
+              <label for="authEmail">Email</label>
+              <input id="authEmail" type="email" placeholder="e.g., you@example.com" required />
+            </div>
+            <div class="form-row">
+              <label for="authPass">Password</label>
+              <input id="authPass" type="password" placeholder="••••••••" minlength="6" required />
+            </div>
+            <button class="primary" type="submit">Continue</button>
+            <p class="form-note" id="authNote"></p>
+          </form>
+        </div>
+
+        <div id="authSignedIn" class="hidden">
+          <div class="account-row">
+            <div>
+              <h3 id="accountName">Your account</h3>
+              <p id="accountEmail" class="muted"></p>
+            </div>
+            <button id="signOutBtn" class="secondary danger">Sign out</button>
+          </div>
+
+          <div class="card-inline">
+            <div class="stat">
+              <span class="muted">Products posted</span>
+              <strong id="statPosted">0</strong>
+            </div>
+            <div class="stat">
+              <span class="muted">Saved items</span>
+              <strong id="statSaved">0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Saved items</h3>
+        <div id="savedList" class="list"></div>
+        <div class="empty-state" id="savedEmpty">
+          <p>No saved items yet.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>© <span id="year"></span> Trade Gate · Built for local businesses</p>
+    <button id="installBtn" class="secondary">Install app</button>
+    <span id="installNote" class="muted"></span>
+  </footer>
+
+  <template id="productCardTpl">
+    <article class="card product-card">
+      <img class="product-img" alt="" />
+      <div class="product-body">
+        <div class="product-header">
+          <h3 class="product-name"></h3>
+          <span class="product-price"></span>
+        </div>
+        <p class="product-desc"></p>
+        <div class="product-meta">
+          <span class="product-category badge"></span>
+          <span class="product-seller muted"></span>
+        </div>
+        <div class="product-actions">
+          <button class="secondary saveBtn">Save</button>
+          <button class="secondary shareBtn">Share</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js" type="module"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>
