@@ -143,6 +143,21 @@
       0% { transform: translateY(0); opacity: 1; }
       100% { transform: translateY(100vh); opacity: 0.8; }
     }
+    /* Audio play button fallback */
+    .audio-play-button {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
   </style>
 </head>
 <body>
@@ -170,6 +185,9 @@
   <div class="snowflake" style="left:50%; animation-duration:12s;">❄</div>
   <div class="snowflake" style="left:70%; animation-duration:9s;">❄</div>
   <div class="snowflake" style="left:90%; animation-duration:11s;">❄</div>
+
+  <!-- WhatsApp audio element: replace the src filename with the actual audio file in the repo or a hosted URL -->
+  <audio id="waAudio" src="whatsapp-audio.mp3" preload="auto"></audio>
 
   <div class="card">
     <h1>🎄 Merry Christmas 🎄</h1>
@@ -226,6 +244,59 @@
         alert("Greeting copied to clipboard! 🎄✨");
       });
     }
+
+    // Audio autoplay handling
+    document.addEventListener('DOMContentLoaded', () => {
+      const audio = document.getElementById('waAudio');
+      if (!audio) return;
+
+      // set a sensible default volume
+      audio.volume = 0.9;
+
+      // Try to play on load. Most browsers block autoplay with sound; if blocked, show a play button.
+      const tryPlay = () => {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            // playing
+            console.log('WhatsApp audio is playing');
+          }).catch((err) => {
+            console.warn('Autoplay prevented, showing play button', err);
+            showPlayButton();
+          });
+        }
+      };
+
+      const showPlayButton = () => {
+        // avoid creating multiple buttons
+        if (document.getElementById('waPlayBtn')) return;
+        const btn = document.createElement('button');
+        btn.id = 'waPlayBtn';
+        btn.className = 'audio-play-button';
+        btn.innerText = 'Play message';
+        btn.onclick = () => {
+          audio.play().then(() => {
+            btn.remove();
+          }).catch((e) => {
+            console.error('Play failed', e);
+            alert('Unable to play audio. If you are on mobile, tap anywhere or use the button again.');
+          });
+        };
+        document.body.appendChild(btn);
+      };
+
+      // small delay to give browser a moment
+      setTimeout(tryPlay, 300);
+
+      // also try again on first user interaction (useful on mobile)
+      const unlock = () => {
+        tryPlay();
+        window.removeEventListener('click', unlock);
+        window.removeEventListener('touchstart', unlock);
+      };
+      window.addEventListener('click', unlock, { once: true });
+      window.addEventListener('touchstart', unlock, { once: true });
+    });
   </script>
 </body>
 </html>
