@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merry Christmas & Happy New Year</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #ffefba, #ffffff);
+      text-align: center;
+      margin: 0;
+      color: #333;
+      overflow-x: hidden;
+    }
+    /* Header with centered profile */
+    header {
+      background: #b30000;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .profile-pic {
+      position: relative;
+      display: inline-block;
+    }
+    .profile-pic img {
+      width: 100px;
+      height: 100px;
+      border-radius: 100%;
+      
+    }
+    .profile-pic .hat {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+    }
+    header h3 {
+      margin-top: 10px;
+      color: #fff;
+      font-size: 1.4em;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 20px auto;
+      position: relative;
+      z-index: 2;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+    button {
+      background: #b30000;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #800000;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #555;
+      text-align: center;
+    }
+    footer a {
+      color: #b30000;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    /* Lights */
+    .lights {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      z-index: 1;
+    }
+    .light {
+      width: 15px;
+      height: 25px;
+      background: yellow;
+      border-radius: 50%;
+      animation: blink 1.5s infinite alternate;
+    }
+    @keyframes blink {
+      from { opacity: 1; }
+      to { opacity: 0.3; }
+    }
+    /* Snowflakes */
+    .snowflake {
+      position: fixed;
+      top: -10px;
+      color: #fff;
+      font-size: 20px;
+      animation: fall linear infinite;
+      z-index: 0;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with Marion's profile pic + festive hat -->
+  <header>
+    <div class="profile-pic">
+      <img src="marion-profile.png" alt="Marion's Profile Picture">
+      <img src="santa-hat.png" class="hat" alt="Santa Hat">
+    </div>
+    <h3>Golden Girl Marion</h3>
+  </header>
+
+  <!-- Decorative lights -->
+  <div class="lights">
+    <div class="light" style="background:red;"></div>
+    <div class="light" style="background:green;"></div>
+    <div class="light" style="background:blue;"></div>
+    <div class="light" style="background:yellow;"></div>
+    <div class="light" style="background:pink;"></div>
+  </div>
+
+  <!-- Snowflakes -->
+  <div class="snowflake" style="left:10%; animation-duration:8s;">❄</div>
+  <div class="snowflake" style="left:30%; animation-duration:10s;">❄</div>
+  <div class="snowflake" style="left:50%; animation-duration:12s;">❄</div>
+  <div class="snowflake" style="left:70%; animation-duration:9s;">❄</div>
+  <div class="snowflake" style="left:90%; animation-duration:11s;">❄</div>
+
+  <div class="card">
+    <h1>🎄 Merry Christmas 🎄</h1>
+    <h2>✨ & Happy New Year ✨</h2>
+    
+    <p>Enter your friend’s name:</p>
+    <input type="text" id="recipient" placeholder="Friend's name">
+    
+    <p>Your name:</p>
+    <input type="text" id="sender" placeholder="Your name">
+    
+    <button onclick="shareMessage()">Send whishes</button>
+    <button onclick="copyGreeting()">Copy Greeting</button>
+  </div>
+  
+  <footer>
+    Dedicated to <strong>Golden girl Marion</strong><br>
+    Designed with love by <a href="https://umarresume.netlify.app" target="_blank">Plax Technologies</a>
+  </footer>
+  
+  <script>
+    function buildMessage() {
+      const recipient = document.getElementById('recipient').value || "Friend";
+      const sender = document.getElementById('sender').value || "Someone special";
+      const siteLink = window.location.href;
+      return `Dear ${recipient}, 🎅 Wishing you a Merry Christmas and a Happy New Year! 🎄✨ From: ${sender}\n\nShare this greeting with your friends: ${siteLink}`;
+    }
+
+    function shareMessage() {
+      const msg = buildMessage();
+      const encodedMsg = encodeURIComponent(msg);
+      
+      // WhatsApp
+      const whatsapp = `https://wa.me/?text=${encodedMsg}`;
+      // Twitter
+      const twitter = `https://twitter.com/intent/tweet?text=${encodedMsg}`;
+      // Facebook
+      const facebook = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${encodedMsg}`;
+      // Email
+      const email = `mailto:?subject=Christmas Greeting&body=${encodedMsg}`;
+      
+      // Open all in new tabs
+      window.open(whatsapp, '_blank');
+      window.open(twitter, '_blank');
+      window.open(facebook, '_blank');
+      window.open(email, '_blank');
+    }
+
+    function copyGreeting() {
+      const msg = buildMessage();
+      navigator.clipboard.writeText(msg).then(() => {
+        alert("Greeting copied to clipboard! 🎄✨");
+      });
+    }
+  </script>
+</body>
+</html>
