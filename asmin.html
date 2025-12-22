@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ASMIN Christmas Wishes</title>
+<meta name="description" content="ASMIN — Share heartfelt Christmas wishes with your community." />
+<style>
+  :root{
+    --bg:#0b1224;
+    --text:#ffffff;
+    --accent:#e63946;
+    --gold:#f3c76a;
+    --green:#2fbf71;
+    --blue:#1e3a8a;
+    --soft:#f8fafc;
+    --card-w: 360px;
+    --card-h: 640px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:linear-gradient(180deg,#0b1224 0%,#1a243f 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
+  a{color:var(--gold)}
+  .wrap{max-width:940px;margin:0 auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .brand{
+    display:flex;align-items:center;gap:12px;
+    font-weight:800;letter-spacing:0.6px;font-size:20px
+  }
+  .brand .mark{
+    width:36px;height:36px;border-radius:50%;
+    background:conic-gradient(from 0deg,#e63946,#f3c76a,#2fbf71,#1e3a8a,#e63946);
+    box-shadow:0 0 16px rgba(243,199,106,.5), inset 0 0 12px rgba(0,0,0,.5);
+  }
+  .sub{opacity:.8;font-size:13px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:920px){.grid{grid-template-columns:1fr 1fr}}
+  .panel{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;padding:16px 14px;
+    backdrop-filter: blur(6px);
+  }
+  h2{margin:8px 0 12px;font-size:18px;font-weight:700}
+  label{display:block;font-size:13px;margin:10px 0 6px;opacity:.9}
+  input[type="text"], textarea, select{
+    width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.07);color:var(--text);outline:none
+  }
+  textarea{min-height:84px;resize:vertical}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > div{flex:1 1 180px}
+  .tog{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .tog button{
+    flex:1 1 auto;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.08);color:var(--text);cursor:pointer
+  }
+  .tog button.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(243,199,106,.2) inset}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .btn{
+    padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
+    background:linear-gradient(180deg,rgba(243,199,106,.25),rgba(243,199,106,.1));
+    color:#fff;cursor:pointer;font-weight:600
+  }
+  .btn.sec{background:rgba(255,255,255,.08)}
+  .note{font-size:12px;opacity:.8;margin-top:8px}
+  /* Card preview container */
+  .preview-wrap{display:flex;justify-content:center}
+  .card-frame{
+    position:relative;width:var(--card-w);height:var(--card-h);
+    margin:0 auto;border-radius:18px;overflow:hidden;
+    box-shadow:0 14px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.15)
+  }
+  /* Lights (animated border) */
+  .lights{
+    position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(8px 8px at 10% 0%, #ff5f5f66 30%, transparent 31%) repeat-x,
+      radial-gradient(8px 8px at 30% 0%, #ffd16666 30%, transparent 31%) repeat-x,
+      radial-gradient(8px 8px at 50% 0%, #06d6a066 30%, transparent 31%) repeat-x,
+      radial-gradient(8px 8px at 70% 0%, #5fb0ff66 30%, transparent 31%) repeat-x,
+      radial-gradient(8px 8px at 90% 0%, #c77dff66 30%, transparent 31%) repeat-x;
+    background-size: calc(var(--card-w)/5) 14px, calc(var(--card-w)/5) 14px, calc(var(--card-w)/5) 14px, calc(var(--card-w)/5) 14px, calc(var(--card-w)/5) 14px;
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+    animation: twinkle 2.2s linear infinite;
+    mask: linear-gradient(#000 0 0) top/100% 14px no-repeat,
+          linear-gradient(#000 0 0) bottom/100% 14px no-repeat,
+          linear-gradient(#000 0 0) left/14px 100% no-repeat,
+          linear-gradient(#000 0 0) right/14px 100% no-repeat;
+    mask-composite: add;
+  }
+  @keyframes twinkle{
+    0%,100%{filter:brightness(1)}
+    50%{filter:brightness(1.6)}
+  }
+  /* Snow overlay */
+  .snow{
+    position:absolute;inset:0;pointer-events:none;overflow:hidden
+  }
+  .flake{
+    position:absolute;top:-10px;border-radius:50%;
+    background:radial-gradient(circle,#fff 0%,#fff 40%,transparent 60%);
+    opacity:.9;filter:blur(.3px);width:6px;height:6px;
+    animation: fall linear forwards
+  }
+  @keyframes fall{
+    to{transform:translateY(calc(var(--card-h) + 20px))}
+  }
+  /* SVG card styling fallback text */
+  .card-svg{width:100%;height:100%;display:block}
+  /* Toast */
+  .toast{
+    position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
+    background:rgba(0,0,0,.7);color:#fff;padding:10px 12px;border-radius:10px;
+    border:1px solid rgba(255,255,255,.18);opacity:0;pointer-events:none;
+    transition:opacity .25s;z-index:9
+  }
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="mark" aria-hidden="true"></div> ASMIN • Christmas Wishes</div>
+    <div class="sub">Create. Share. Celebrate together.</div>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-label="Create wish form">
+      <h2>Compose your wish</h2>
+      <label for="name">Your name</label>
+      <input id="name" type="text" placeholder="e.g., Atukwasa Umar (Bit)" />
+
+      <label for="to">To (recipient or group)</label>
+      <input id="to" type="text" placeholder="e.g., ASMIN family" />
+
+      <label for="msg">Message</label>
+      <textarea id="msg" placeholder="Write a warm, specific wish..."></textarea>
+
+      <div class="row">
+        <div>
+          <label for="theme">Theme</label>
+          <select id="theme">
+            <option value="classic">Classic Red & Green</option>
+            <option value="midnight">Midnight Blue & Gold</option>
+            <option value="pastel">Candy Pastel</option>
+          </select>
+        </div>
+        <div>
+          <label for="photo">Optional photo</label>
+          <input id="photo" type="file" accept="image/*" />
+        </div>
+      </div>
+
+      <div class="tog" role="group" aria-label="Effects toggles">
+        <button id="tSnow" class="active" type="button">Snow</button>
+        <button id="tLights" class="active" type="button">Lights</button>
+        <button id="tMusic" type="button">Music</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="apply">Preview wish</button>
+        <button class="btn sec" id="reset">Reset</button>
+      </div>
+      <p class="note">Tip: add details that only your ASMIN people would recognize — it makes the wish feel truly yours.</p>
+    </section>
+
+    <section class="panel" aria-label="Preview and share">
+      <h2>Preview & share</h2>
+
+      <div class="preview-wrap">
+        <div class="card-frame" id="cardFrame" aria-live="polite">
+          <!-- Lights -->
+          <div class="lights" id="lights"></div>
+          <!-- Snow -->
+          <div class="snow" id="snow"></div>
+
+          <!-- SVG Card -->
+          <svg id="card" class="card-svg" viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gClassic" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#22543d"/>
+                <stop offset="100%" stop-color="#8a1622"/>
+              </linearGradient>
+              <linearGradient id="gMidnight" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0b1224"/>
+                <stop offset="100%" stop-color="#1e3a8a"/>
+              </linearGradient>
+              <linearGradient id="gPastel" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffe8f1"/>
+                <stop offset="100%" stop-color="#d9f7ff"/>
+              </linearGradient>
+              <filter id="softGlow">
+                <feGaussianBlur stdDeviation="12" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <rect id="bg" x="0" y="0" width="360" height="640" rx="18" fill="url(#gMidnight)"/>
+
+            <!-- Top banner -->
+            <g filter="url(#softGlow)">
+              <text x="50%" y="52" text-anchor="middle" font-size="22" font-weight="700" fill="#f3c76a">ASMIN • Merry Christmas</text>
+              <text id="toText" x="50%" y="82" text-anchor="middle" font-size="14" fill="#ffffff">To the ASMIN family</text>
+            </g>
+
+            <!-- Photo mask -->
+            <defs>
+              <clipPath id="photoMask">
+                <circle cx="180" cy="160" r="56"/>
+              </clipPath>
+            </defs>
+            <circle cx="180" cy="160" r="64" fill="#ffffff22" stroke="#ffffff55" stroke-width="2"/>
+            <image id="photoImg" x="124" y="104" width="112" height="112" href="" clip-path="url(#photoMask)" preserveAspectRatio="xMidYMid slice"/>
+
+            <!-- Message block -->
+            <rect x="24" y="238" width="312" height="244" rx="14" fill="#0000003a" stroke="#ffffff33"/>
+            <foreignObject x="30" y="246" width="300" height="228">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="font: 16px/1.4 system-ui; color:#fff;">
+                <div id="msgText" style="white-space:pre-wrap"></div>
+                <div id="fromText" style="margin-top:10px; font-weight:700; color:#f3c76a;"></div>
+              </div>
+            </foreignObject>
+
+            <!-- Footer -->
+            <g>
+              <text x="50%" y="520" text-anchor="middle" font-size="12" fill="#ffffffaa">May your season be bright</text>
+              <text x="50%" y="540" text-anchor="middle" font-size="12" fill="#ffffff66">Share love • Spread light</text>
+            </g>
+
+            <!-- Bottom ribbon -->
+            <rect x="0" y="570" width="360" height="70" fill="#00000022"/>
+            <text x="50%" y="610" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">ASMIN — Together, we make magic</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:12px">
+        <button class="btn" id="download">Download card (PNG)</button>
+        <button class="btn sec" id="copyUrl">Copy share link</button>
+        <button class="btn sec" id="shareNative">Share</button>
+        <button class="btn sec" id="playMusic">Play carol</button>
+        <button class="btn sec" id="stopMusic">Stop carol</button>
+      </div>
+      <p class="note">Your share link encodes the wish in the URL, so it’s easy for ASMIN members to open and reshare.</p>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- State ---------- */
+const el = {
+  name: document.getElementById('name'),
+  to: document.getElementById('to'),
+  msg: document.getElementById('msg'),
+  theme: document.getElementById('theme'),
+  photo: document.getElementById('photo'),
+  apply: document.getElementById('apply'),
+  reset: document.getElementById('reset'),
+  tSnow: document.getElementById('tSnow'),
+  tLights: document.getElementById('tLights'),
+  tMusic: document.getElementById('tMusic'),
+  frame: document.getElementById('cardFrame'),
+  snow: document.getElementById('snow'),
+  lights: document.getElementById('lights'),
+  card: document.getElementById('card'),
+  bg: document.getElementById('bg'),
+  toText: document.getElementById('toText'),
+  msgText: document.getElementById('msgText'),
+  fromText: document.getElementById('fromText'),
+  photoImg: document.getElementById('photoImg'),
+  download: document.getElementById('download'),
+  copyUrl: document.getElementById('copyUrl'),
+  shareNative: document.getElementById('shareNative'),
+  playMusic: document.getElementById('playMusic'),
+  stopMusic: document.getElementById('stopMusic'),
+  toast: document.getElementById('toast')
+};
+
+let state = {
+  name: '',
+  to: 'ASMIN family',
+  msg: 'Wishing you peace, joy, and a glow that lasts past the holidays.',
+  theme: 'midnight',
+  photoDataUrl: '',
+  snow: true,
+  lights: true,
+  music: false
+};
+
+function showToast(text){
+  el.toast.textContent = text;
+  el.toast.classList.add('show');
+  setTimeout(()=>el.toast.classList.remove('show'), 1600);
+}
+
+/* ---------- Effects: Snow ---------- */
+let snowTimer = null;
+function startSnow(){
+  stopSnow();
+  if(!state.snow) return;
+  const W = 360, H = 640;
+  function spawn(){
+    if(!state.snow) return;
+    const flake = document.createElement('div');
+    flake.className = 'flake';
+    const size = Math.random()*3 + 3;
+    flake.style.width = size+'px';
+    flake.style.height = size+'px';
+    const left = Math.random()*W;
+    const dur = Math.random()*4 + 6;
+    flake.style.left = left+'px';
+    flake.style.animationDuration = dur+'s';
+    // drift
+    flake.animate([{transform:'translateY(0) translateX(0)'},{transform:`translateY(${H+20}px) translateX(${(Math.random()*40-20)}px)`}],{duration:dur*1000,fill:'forwards',easing:'linear'});
+    el.snow.appendChild(flake);
+    setTimeout(()=>flake.remove(), dur*1000+200);
+  }
+  snowTimer = setInterval(spawn, 220);
+}
+function stopSnow(){
+  if(snowTimer){clearInterval(snowTimer);snowTimer=null;}
+  el.snow.innerHTML='';
+}
+
+/* ---------- Theme ---------- */
+function applyTheme(){
+  let fill = 'url(#gMidnight)';
+  if(state.theme === 'classic') fill = 'url(#gClassic)';
+  if(state.theme === 'pastel') fill = 'url(#gPastel)';
+  el.bg.setAttribute('fill', fill);
+}
+
+/* ---------- Populate card ---------- */
+function renderCard(){
+  applyTheme();
+  el.toText.textContent = state.to ? `To ${state.to}` : 'To someone special';
+  el.msgText.textContent = state.msg || '';
+  el.fromText.textContent = state.name ? `— ${state.name}` : '— Anonymous';
+  if(state.photoDataUrl){
+    el.photoImg.setAttribute('href', state.photoDataUrl);
+  }else{
+    el.photoImg.removeAttribute('href');
+  }
+  // Toggles
+  el.lights.style.display = state.lights ? 'block' : 'none';
+  if(state.snow) startSnow(); else stopSnow();
+}
+
+/* ---------- Inputs ---------- */
+el.apply.addEventListener('click', ()=>{
+  state.name = el.name.value.trim();
+  state.to = el.to.value.trim() || 'ASMIN family';
+  state.msg = el.msg.value.trim() || 'Wishing you peace, joy, and a glow that lasts past the holidays.';
+  state.theme = el.theme.value;
+  renderCard();
+  showToast('Preview updated');
+});
+
+el.reset.addEventListener('click', ()=>{
+  el.name.value = '';
+  el.to.value = '';
+  el.msg.value = '';
+  el.theme.value = 'midnight';
+  state = {
+    name: '',
+    to: 'ASMIN family',
+    msg: 'Wishing you peace, joy, and a glow that lasts past the holidays.',
+    theme: 'midnight',
+    photoDataUrl: '',
+    snow: true,
+    lights: true,
+    music: false
+  };
+  renderCard();
+  showToast('Reset to defaults');
+});
+
+el.photo.addEventListener('change', ()=>{
+  const file = el.photo.files?.[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    state.photoDataUrl = e.target.result;
+    renderCard();
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ---------- Toggles ---------- */
+function toggle(btn, key){
+  btn.classList.toggle('active');
+  state[key] = btn.classList.contains('active');
+  renderCard();
+}
+el.tSnow.addEventListener('click', ()=>toggle(el.tSnow,'snow'));
+el.tLights.addEventListener('click', ()=>toggle(el.tLights,'lights'));
+el.tMusic.addEventListener('click', ()=>toggle(el.tMusic,'music'));
+
+/* ---------- Share link ---------- */
+function buildUrlFromState(){
+  const data = {
+    n: state.name,
+    t: state.to,
+    m: state.msg,
+    th: state.theme,
+    s: state.snow?1:0,
+    l: state.lights?1:0,
+    mu: state.music?1:0,
+    p: state.photoDataUrl || ''
+  };
+  const q = new URLSearchParams();
+  Object.entries(data).forEach(([k,v])=>q.set(k, v));
+  return `${location.origin}${location.pathname}?${q.toString()}`;
+}
+function applyUrlToState(){
+  const q = new URLSearchParams(location.search);
+  if([...q.keys()].length===0) return;
+  state.name = q.get('n')||'';
+  state.to = q.get('t')||'ASMIN family';
+  state.msg = q.get('m')||state.msg;
+  state.theme = q.get('th')||'midnight';
+  state.snow = (q.get('s')||'1')==='1';
+  state.lights = (q.get('l')||'1')==='1';
+  state.music = (q.get('mu')||'0')==='1';
+  state.photoDataUrl = q.get('p')||'';
+  // reflect in form
+  el.name.value = state.name;
+  el.to.value = state.to;
+  el.msg.value = state.msg;
+  el.theme.value = state.theme;
+  el.tSnow.classList.toggle('active', state.snow);
+  el.tLights.classList.toggle('active', state.lights);
+  el.tMusic.classList.toggle('active', state.music);
+  renderCard();
+}
+applyUrlToState();
+
+/* ---------- Clipboard & native share ---------- */
+el.copyUrl.addEventListener('click', async ()=>{
+  try{
+    const url = buildUrlFromState();
+    await navigator.clipboard.writeText(url);
+    showToast('Share link copied');
+  }catch(e){
+    showToast('Copy failed — select & copy manually');
+  }
+});
+el.shareNative.addEventListener('click', async ()=>{
+  const url = buildUrlFromState();
+  if(navigator.share){
+    try{
+      await navigator.share({title:'ASMIN Christmas Wish', text:'A Christmas wish for you 🎄', url});
+      showToast('Shared');
+    }catch(e){
+      showToast('Share canceled');
+    }
+  }else{
+    await navigator.clipboard.writeText(url);
+    showToast('Link copied (native share unavailable)');
+  }
+});
+
+/* ---------- Download PNG (SVG -> Canvas) ---------- */
+el.download.addEventListener('click', async ()=>{
+  try{
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(el.card);
+    const svgBlob = new Blob([svgStr], {type:'image/svg+xml'});
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      canvas.width = 360; canvas.height = 640;
+      const ctx = canvas.getContext('2d');
+      // background fill to ensure opaque
+      ctx.fillStyle = '#0b1224';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img,0,0);
+      URL.revokeObjectURL(svgUrl);
+      canvas.toBlob(blob=>{
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `ASMIN_Christmas_Wish.png`;
+        a.click();
+        showToast('Downloaded card');
+      }, 'image/png');
+    };
+    img.onerror = ()=>{showToast('Download failed')};
+    img.src = svgUrl;
+  }catch(e){
+    showToast('Download failed');
+  }
+});
+
+/* ---------- Music (WebAudio: simple carol motif) ---------- */
+let audioCtx = null;
+let playing = false;
+function playCarol(){
+  if(playing) return;
+  playing = true;
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  const notes = [
+    // Silent Night motif (approx, short)
+    {f:261.63, d:0.5},{f:293.66, d:0.5},{f:261.63, d:0.5},{f:349.23, d:0.8},{f:329.63, d:1.2},
+    {f:261.63, d:0.5},{f:293.66, d:0.5},{f:261.63, d:0.5},{f:392.00, d:0.8},{f:349.23, d:1.2},
+    {f:261.63, d:0.5},{f:523.25, d:0.6},{f:440.00, d:0.6},{f:349.23, d:0.6},{f:392.00, d:1.2},
+  ];
+  const start = audioCtx.currentTime + 0.05;
+  let t = start;
+  notes.forEach((n, i)=>{
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = n.f;
+    const attack = 0.02, sustain = n.d-0.08, release = 0.06;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.25, t+attack);
+    gain.gain.setValueAtTime(0.25, t+attack+sustain);
+    gain.gain.linearRampToValueAtTime(0.0001, t+attack+sustain+release);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t+attack+sustain+release);
+    t += n.d + 0.04;
+  });
+  showToast('Playing carol');
+}
+function stopCarol(){
+  if(!audioCtx) return;
+  audioCtx.close().catch(()=>{}).finally(()=>{
+    audioCtx = null;
+    playing = false;
+    showToast('Carol stopped');
+  });
+}
+el.playMusic.addEventListener('click', ()=>{ if(state.music || true) playCarol(); });
+el.stopMusic.addEventListener('click', stopCarol);
+
+/* ---------- Initial render ---------- */
+renderCard();
+
+/* ---------- Deep link helper: update URL on preview ---------- */
+function updateUrl(){
+  const url = buildUrlFromState();
+  history.replaceState(null, '', url);
+}
+el.apply.addEventListener('click', updateUrl);
+
+/* ---------- Accessibility: keyboard shortcuts ---------- */
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='s'){ el.tSnow.click(); }
+  if(e.key==='l'){ el.tLights.click(); }
+  if(e.key==='m'){ el.tMusic.click(); }
+});
+</script>
+</body>
+</html>
