@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Business Records & Analytics</title>
+
+  <!-- Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Chart.js & jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+  <header class="app-header">
+    <div class="brand">
+      <span class="material-icons">dashboard</span>
+      <h1>Business records & analytics</h1>
+    </div>
+    <div class="header-actions">
+      <button id="themeToggle" class="icon-btn" title="Toggle theme">
+        <span class="material-icons">brightness_6</span>
+      </button>
+      <button id="showAnalyticsBtn" class="icon-btn" title="View analytics">
+        <i class="fas fa-chart-pie"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Add transaction -->
+    <section class="panel">
+      <div class="panel-title">
+        <span class="material-icons">add_circle</span>
+        <h2>Add transaction</h2>
+      </div>
+
+      <form id="addForm" class="form-grid" autocomplete="off">
+        <div class="form-field">
+          <label>Type</label>
+          <select id="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Date</label>
+          <input type="date" id="date"/>
+        </div>
+        <div class="form-field">
+          <label>Category</label>
+          <input type="text" id="category" placeholder="Sales, Supplies, Payroll"/>
+        </div>
+        <div class="form-field">
+          <label>Amount</label>
+          <input type="number" id="amount" step="0.01" min="0"/>
+        </div>
+        <div class="form-field">
+          <label>Debit</label>
+          <input type="number" id="debit" step="0.01" min="0"/>
+        </div>
+        <div class="form-field">
+          <label>Method</label>
+          <select id="method">
+            <option value="cash">Cash</option>
+            <option value="mobile">Mobile money</option>
+            <option value="bank">Bank</option>
+            <option value="card">Card</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Reference</label>
+          <input type="text" id="reference" placeholder="Invoice #, Receipt #"/>
+        </div>
+        <div class="form-field full">
+          <label>Notes</label>
+          <textarea id="notes" placeholder="Optional details..."></textarea>
+        </div>
+        <div class="form-field">
+          <label>Recorder name</label>
+          <input type="text" id="recorderName" placeholder="Your name"/>
+        </div>
+        <div class="form-field">
+          <label>Recorder phone</label>
+          <input type="text" id="recorderPhone" placeholder="+256..."/>
+        </div>
+      </form>
+
+      <div class="actions">
+        <button id="addBtn" class="btn primary" title="Add">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button id="exportCsvBtn" class="btn warn" title="Export CSV">
+          <i class="fas fa-file-csv"></i>
+        </button>
+        <button id="exportPdfBtn" class="btn warn" title="Export PDF">
+          <i class="fas fa-file-pdf"></i>
+        </button>
+        <button id="clearBtn" class="btn danger" title="Clear all">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Filters / stats / table -->
+    <section class="panel">
+      <div class="panel-title">
+        <span class="material-icons">filter_alt</span>
+        <h2>Filters & stats</h2>
+      </div>
+
+      <div class="filters">
+        <div class="form-field">
+          <label>Start date</label>
+          <input type="date" id="startDate">
+        </div>
+        <div class="form-field">
+          <label>End date</label>
+          <input type="date" id="endDate">
+        </div>
+        <div class="form-field">
+          <label>Category</label>
+          <input type="text" id="filterCategory" placeholder="Optional">
+        </div>
+        <div class="filter-actions">
+          <button id="applyFilters" class="btn" title="Apply">
+            <span class="material-icons">play_arrow</span>
+          </button>
+          <button id="resetFilters" class="btn" title="Reset">
+            <span class="material-icons">restart_alt</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="label">Income total</div>
+          <div class="value" id="incomeTotal">UGX 0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Expense total</div>
+          <div class="value" id="expenseTotal">UGX 0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Net</div>
+          <div class="value" id="netTotal">UGX 0</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table id="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Debit</th>
+                <th>Method</th>
+                <th>Reference</th>
+                <th>Notes</th>
+                <th>Recorder</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Analytics overlay -->
+  <div id="analyticsOverlay" class="overlay">
+    <div class="overlay-inner">
+      <div class="overlay-bar">
+        <div class="overlay-title">
+          <i class="fas fa-chart-line"></i>
+          <h3>Analytics</h3>
+        </div>
+        <div class="overlay-actions">
+          <button id="exportMonthlyImg" class="icon-btn" title="Export monthly chart">
+            <i class="fas fa-download"></i>
+          </button>
+          <button id="exportCategoryImg" class="icon-btn" title="Export category chart">
+            <i class="fas fa-download"></i>
+          </button>
+          <button id="exportDebitImg" class="icon-btn" title="Export debit chart">
+            <i class="fas fa-download"></i>
+          </button>
+          <button id="exportCashflowImg" class="icon-btn" title="Export cashflow chart">
+            <i class="fas fa-download"></i>
+          </button>
+          <button id="closeAnalyticsBtn" class="icon-btn" title="Close">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h4><span class="material-icons">bar_chart</span> Monthly totals</h4>
+          <canvas id="monthlyChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4><span class="material-icons">pie_chart</span> Category breakdown</h4>
+          <canvas id="categoryChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4><i class="fas fa-coins"></i> Debit over time</h4>
+          <canvas id="debitChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4><span class="material-icons">show_chart</span> Cashflow cumulative</h4>
+          <canvas id="cashflowChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit modal -->
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="panel-title">
+          <span class="material-icons">edit</span>
+          <h3>Edit record</h3>
+        </div>
+        <button id="closeModalBtn" class="icon-btn"><span class="material-icons">close</span></button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Type</label>
+          <select id="edit_type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Date</label>
+          <input type="date" id="edit_date"/>
+        </div>
+        <div class="form-field">
+          <label>Category</label>
+          <input type="text" id="edit_category"/>
+        </div>
+        <div class="form-field">
+          <label>Amount</label>
+          <input type="number" id="edit_amount" step="0.01" min="0"/>
+        </div>
+        <div class="form-field">
+          <label>Debit</label>
+          <input type="number" id="edit_debit" step="0.01" min="0"/>
+        </div>
+        <div class="form-field">
+          <label>Method</label>
+          <select id="edit_method">
+            <option value="cash">Cash</option>
+            <option value="mobile">Mobile money</option>
+            <option value="bank">Bank</option>
+            <option value="card">Card</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Reference</label>
+          <input type="text" id="edit_reference"/>
+        </div>
+        <div class="form-field full">
+          <label>Notes</label>
+          <textarea id="edit_notes"></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="saveEditBtn" class="btn primary" title="Save changes">
+          <span class="material-icons">save</span>
+        </button>
+        <button id="deleteEditBtn" class="btn danger" title="Delete record">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+
+      <div id="editFooter" class="modal-footer">
+        <!-- Recorded by: Name (Phone) will render here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
