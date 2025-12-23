@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CV Builder</title>
+
+  <!-- Fonts and libraries -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="template-creative">
+  <header class="app-header">
+    <div class="brand">
+      <h1>CV builder</h1>
+    </div>
+    <div class="header-actions">
+      <select id="templateSelect" title="Template">
+        <option value="creative">Creative</option>
+        <option value="minimalist">Minimalist</option>
+        <option value="academic">Academic</option>
+      </select>
+      <button id="toggleTheme" class="icon-btn" title="Toggle theme">Theme</button>
+      <button id="downloadPdf" class="icon-btn" title="Download PDF">Download PDF</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <!-- Editor -->
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Edit</h2>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Full name</label>
+            <input id="name" placeholder="Your full name"/>
+          </div>
+          <div>
+            <label>Professional title</label>
+            <input id="role" placeholder="e.g., Full‑stack Developer"/>
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label>Email</label>
+            <input id="email" placeholder="you@example.com"/>
+          </div>
+          <div>
+            <label>Phone</label>
+            <input id="phone" placeholder="+256…"/>
+          </div>
+          <div>
+            <label>Location</label>
+            <input id="location" placeholder="City, Country"/>
+          </div>
+        </div>
+
+        <label>Summary</label>
+        <textarea id="summary" placeholder="A short professional summary…"></textarea>
+
+        <div class="section">
+          <h3>Experience</h3>
+          <div id="xpList" class="list"></div>
+          <div class="actions">
+            <button id="addXp" class="btn primary">Add experience</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Education</h3>
+          <div id="eduList" class="list"></div>
+          <div class="actions">
+            <button id="addEdu" class="btn primary">Add education</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Skills</h3>
+          <div id="skillsList" class="list"></div>
+          <div class="actions">
+            <button id="addSkill" class="btn primary">Add skill</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Projects</h3>
+          <div id="projList" class="list"></div>
+          <div class="actions">
+            <button id="addProj" class="btn primary">Add project</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="save" class="btn warn">Save</button>
+          <button id="clear" class="btn danger">Clear</button>
+        </div>
+      </section>
+
+      <!-- Preview -->
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Preview</h2>
+        </div>
+        <div id="paper" class="paper">
+          <div class="name" id="pv_name">Your Name</div>
+          <div class="title" id="pv_role">Your Title</div>
+          <div class="contact" id="pv_contact">Email • Phone • Location</div>
+
+          <div class="section" id="pv_summary_wrap" style="display:none">
+            <h3>Summary</h3>
+            <div id="pv_summary"></div>
+          </div>
+
+          <div class="section" id="pv_xp_wrap" style="display:none">
+            <h3>Experience</h3>
+            <div id="pv_xp"></div>
+          </div>
+
+          <div class="section" id="pv_edu_wrap" style="display:none">
+            <h3>Education</h3>
+            <div id="pv_edu"></div>
+          </div>
+
+          <div class="section" id="pv_skills_wrap" style="display:none">
+            <h3>Skills</h3>
+            <div id="pv_skills" class="skills"></div>
+          </div>
+
+          <div class="section" id="pv_proj_wrap" style="display:none">
+            <h3>Projects</h3>
+            <div id="pv_proj"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
