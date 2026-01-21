@@ -1,24 +1,25 @@
 {
-  "name": "trade-gate",
-  "version": "1.0.0",
-  "description": "Trade Gate PWA — businesses post products, clients browse and save.",
+  "name": "orion-mkt",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "serve -s .",
-    "dev": "http-server -c-1 -p 8080"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "pwa",
-    "trade",
-    "marketplace",
-    "offline",
-    "installable"
-  ],
-  "author": "Trade Gate",
-  "license": "MIT",
+  "dependencies": {
+    "jspdf": "^4.0.0",
+    "jspdf-autotable": "^5.0.7",
+    "lucide-react": "^0.562.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "recharts": "^3.6.0"
+  },
   "devDependencies": {
-    "http-server": "^14.1.1",
-    "serve": "^14.2.1"
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
   }
 }
